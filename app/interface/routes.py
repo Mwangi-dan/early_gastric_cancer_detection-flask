@@ -6,6 +6,7 @@ import os
 import uuid
 import zipfile
 import shutil
+from werkzeug.utils import secure_filename
 
 
 interface = Blueprint('interface', __name__)
@@ -104,6 +105,8 @@ def predict():
             flash(f"Error during prediction: {str(e)}", "danger")
 
     return render_template("predict.html", models=models, prediction_result=prediction_result)
+
+
 """
 
 @interface.route('/predict', methods=['GET', 'POST'])
@@ -166,7 +169,9 @@ def model():
 
 @interface.route('/train-model', methods=['GET', 'POST'])
 def train_model():
-    model_info = None  # Initialize the model info to None
+    model_info = None
+    plot_url = None
+    confusion_matrix_url = None
 
     if request.method == 'POST':
         zip_file = request.files.get('zip_file')
@@ -193,9 +198,26 @@ def train_model():
                 "model_path": data.get("saved_model"),
             }
 
+            # URLs for plots
+            plot_url = f"{FASTAPI_URL}/get-training-plot/"
+            confusion_matrix_url = f"{FASTAPI_URL}/get-confusion-matrix/"
+
         except requests.exceptions.RequestException as e:
             flash(f"Error during training: {str(e)}", "danger")
 
-        return render_template("train.html", model_info=model_info)
+        return render_template("train.html", model_info=model_info, plot_url=plot_url, confusion_matrix_url=confusion_matrix_url)
 
-    return render_template("train.html", model_info=model_info)
+    return render_template("train.html", model_info=model_info, plot_url=plot_url, confusion_matrix_url=confusion_matrix_url)
+
+
+
+
+@interface.route("/view-training-plot/")
+def view_training_plot():
+    # Redirect to the FastAPI endpoint
+    return redirect(f"{FASTAPI_URL}/get-training-plot/")
+
+@interface.route("/view-confusion-matrix/")
+def view_confusion_matrix():
+    # Redirect to the FastAPI endpoint
+    return redirect(f"{FASTAPI_URL}/get-confusion-matrix/")
