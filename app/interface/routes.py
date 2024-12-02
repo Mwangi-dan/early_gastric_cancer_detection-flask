@@ -7,11 +7,12 @@ import uuid
 import zipfile
 import shutil
 from werkzeug.utils import secure_filename
+from random import random
 
 
 interface = Blueprint('interface', __name__)
 
-FASTAPI_URL = "http://127.0.0.1:8000"
+FASTAPI_URL = "http://localhost:8000"
 
 
 UPLOAD_FOLDER = 'app/static/uploads'

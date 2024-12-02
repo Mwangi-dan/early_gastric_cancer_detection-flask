@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  flask-app:
+    image: gastriccanceracr.azurecr.io/flask-app:latest  # Replace with your ACR image URL or Docker Hub image
+    container_name: flask-app
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    depends_on:
+      - fastapi-app
+
+  fastapi-app:
+    image: gastriccanceracr.azurecr.io/fastapi-app:latest  # Replace with your ACR image URL or Docker Hub image
+    container_name: fastapi-container
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/static:/app/static 
+
+networks:
+  app-network:
+    driver: bridge
